@@ -1,0 +1,88 @@
+/* ===========================
+   Login page styles
+   =========================== */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+}
+
+.login-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.login-brand .logo-mark {
+  font-size: 2.4rem;
+  color: var(--coal);
+}
+
+.login-brand .logo-tag {
+  display: block;
+  margin-left: 0;
+  margin-top: 0.25rem;
+  color: var(--steel);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.login-form .form-group label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--steel);
+  font-weight: 500;
+}
+
+.login-form .form-group input {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.login-form .form-group input:focus {
+  border-color: var(--copper);
+}
+
+.login-form .btn-primary {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.login-error {
+  color: var(--copper-dark);
+  font-size: 0.82rem;
+  text-align: center;
+  min-height: 1.4em;
+}

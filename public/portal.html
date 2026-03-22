@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Status | RoofView Demo Co</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+<body>
+
+  <div class="portal-page">
+    <!-- Brand header (no nav, public page) -->
+    <div class="portal-header">
+      <div class="logo-mark" style="font-family: var(--font-display);">Roof<span>View</span></div>
+      <div class="logo-tag">Demo Co</div>
+      <h2 id="portalTitle">Loading project...</h2>
+      <p class="portal-subtitle" id="portalSubtitle"></p>
+    </div>
+
+    <div id="portalContent" style="display:none;">
+      <!-- Status stepper -->
+      <div class="portal-stepper" id="portalStepper"></div>
+
+      <!-- Project details -->
+      <div class="portal-details" id="portalDetails"></div>
+
+      <!-- Files -->
+      <div class="portal-files" id="portalFiles"></div>
+
+      <!-- Updated -->
+      <div class="portal-updated" id="portalUpdated"></div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>RoofView Demo Co</strong> &middot; Demo Application
+  </footer>
+
+  <script src="/js/shared.js"></script>
+  <script src="/js/portal.js"></script>
+
+</body>
+</html>

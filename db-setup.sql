@@ -20,9 +20,35 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Sessions table for admin authentication
+CREATE TABLE IF NOT EXISTS sessions (
+    id SERIAL PRIMARY KEY,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+
 -- Create index for common queries
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
 CREATE INDEX IF NOT EXISTS idx_projects_client ON projects(client_name);
+
+-- Client portal token on projects
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS client_token UUID DEFAULT gen_random_uuid();
+
+-- File metadata (actual files stored in Netlify Blobs)
+CREATE TABLE IF NOT EXISTS project_files (
+    id SERIAL PRIMARY KEY,
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    filename VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(100) NOT NULL,
+    file_size INTEGER NOT NULL,
+    blob_key VARCHAR(500) NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_project_files_project ON project_files(project_id);
 
 -- Seed with demo data
 INSERT INTO projects (project_name, client_name, client_email, roof_type, membrane, square_footage, scale_ratio, status, price, notes) VALUES

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Detail | RoofView Demo Co</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/project.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <a href="/dashboard.html">
+        <div class="logo-mark">Roof<span>View</span></div>
+        <div class="logo-tag">Demo Co</div>
+      </a>
+    </div>
+    <nav class="nav-links"></nav>
+    <div class="header-actions">
+      <button class="btn btn-ghost" onclick="logout()">Log Out</button>
+    </div>
+  </header>
+
+  <div class="project-page" id="projectContent">
+    <a href="/dashboard.html" class="project-back">← Back to Dashboard</a>
+
+    <div class="project-header">
+      <h1 id="projectName">Loading...</h1>
+    </div>
+
+    <!-- Status timeline -->
+    <div class="status-timeline" id="statusTimeline">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Project info grid -->
+    <div class="project-info" id="projectInfo">
+      <div class="info-item"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- Client portal link -->
+    <div class="portal-link-section" id="portalLink"></div>
+
+    <!-- Notes -->
+    <div class="project-notes" id="projectNotes"></div>
+
+    <!-- Files -->
+    <div class="files-section">
+      <h3>Files &amp; Photos</h3>
+      <div class="upload-zone" id="uploadZone">
+        <p>Drop files here or click to upload</p>
+        <small>Images, PDFs, documents up to 4MB</small>
+        <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
+      </div>
+      <div class="file-grid" id="fileGrid"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <footer>
+    <strong>RoofView Demo Co</strong> &middot; Built with Neon + Netlify + Git &middot; Demo Application
+  </footer>
+
+  <script src="/js/shared.js"></script>
+  <script src="/js/project.js"></script>
+
+</body>
+</html>

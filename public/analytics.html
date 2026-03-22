@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics | RoofView Demo Co</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/analytics.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <a href="/dashboard.html">
+        <div class="logo-mark">Roof<span>View</span></div>
+        <div class="logo-tag">Demo Co</div>
+      </a>
+    </div>
+    <nav class="nav-links"></nav>
+    <div class="header-actions">
+      <button class="btn btn-ghost" onclick="logout()">Log Out</button>
+    </div>
+  </header>
+
+  <div class="analytics-page">
+    <h2>Analytics</h2>
+
+    <!-- Summary cards -->
+    <div class="analytics-summary" id="analyticsSummary">
+      <div class="summary-card"><div class="loading"><div class="spinner"></div></div></div>
+      <div class="summary-card"><div class="loading"><div class="spinner"></div></div></div>
+      <div class="summary-card"><div class="loading"><div class="spinner"></div></div></div>
+      <div class="summary-card"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- Charts -->
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h4>Project Status</h4>
+        <canvas id="statusChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>Monthly Revenue</h4>
+        <canvas id="revenueChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>New Projects per Month</h4>
+        <canvas id="trendChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>Projects by Roof Type</h4>
+        <canvas id="roofTypesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <footer>
+    <strong>RoofView Demo Co</strong> &middot; Built with Neon + Netlify + Git &middot; Demo Application
+  </footer>
+
+  <script src="/js/shared.js"></script>
+  <script src="/js/analytics.js"></script>
+
+</body>
+</html>
