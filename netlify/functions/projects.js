@@ -1,4 +1,5 @@
 const { neon } = require("@neondatabase/serverless");
+const { checkSession, unauthorizedResponse } = require("./lib/auth-check");
 
 exports.handler = async (event) => {
   const headers = {
@@ -15,12 +16,46 @@ exports.handler = async (event) => {
   try {
     const sql = neon(process.env.DATABASE_URL);
 
-    // GET - List all projects (with optional status filter)
+    // Auth check for write operations
+    if (["POST", "PUT", "DELETE"].includes(event.httpMethod)) {
+      const session = await checkSession(event);
+      if (!session) return unauthorizedResponse(headers);
+    }
+
+    // GET - List projects or get single project with files
     if (event.httpMethod === "GET") {
       const params = event.queryStringParameters || {};
 
+      // Single project by ID — includes files
+      if (params.id) {
+        const projectRows = await sql(
+          `SELECT p.*, p.client_token FROM projects p WHERE p.id = $1`,
+          [params.id]
+        );
+
+        if (projectRows.length === 0) {
+          return {
+            statusCode: 404,
+            headers,
+            body: JSON.stringify({ error: "Project not found" }),
+          };
+        }
+
+        const files = await sql(
+          `SELECT id, filename, mime_type, file_size, uploaded_at FROM project_files WHERE project_id = $1 ORDER BY uploaded_at DESC`,
+          [params.id]
+        );
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ project: projectRows[0], files }),
+        };
+      }
+
+      // List all projects
       let query = `
-        SELECT 
+        SELECT
           p.id,
           p.project_name,
           p.client_name,
@@ -32,6 +67,7 @@ exports.handler = async (event) => {
           p.status,
           p.price,
           p.notes,
+          p.client_token,
           p.created_at,
           p.updated_at
         FROM projects p
@@ -71,6 +107,11 @@ exports.handler = async (event) => {
     if (event.httpMethod === "POST") {
       const data = JSON.parse(event.body);
 
+      // Trim string fields
+      for (const key of ['project_name', 'client_name', 'client_email', 'roof_type', 'membrane', 'scale_ratio', 'notes']) {
+        if (typeof data[key] === 'string') data[key] = data[key].trim();
+      }
+
       const required = [
         "project_name",
         "client_name",
@@ -90,10 +131,45 @@ exports.handler = async (event) => {
         }
       }
 
+      // Validate email format
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRe.test(data.client_email)) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: "Invalid email address" }),
+        };
+      }
+
+      // Validate numeric fields
+      if (isNaN(parseFloat(data.square_footage)) || parseFloat(data.square_footage) <= 0) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: "Square footage must be a positive number" }),
+        };
+      }
+
+      if (data.price && (isNaN(parseFloat(data.price)) || parseFloat(data.price) < 0)) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: "Price must be a non-negative number" }),
+        };
+      }
+
+      // Validate string lengths
+      if (data.project_name.length > 255) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Project name too long (max 255 chars)" }) };
+      }
+      if (data.notes && data.notes.length > 5000) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Notes too long (max 5000 chars)" }) };
+      }
+
       const rows = await sql(
-        `INSERT INTO projects 
-          (project_name, client_name, client_email, roof_type, membrane, square_footage, scale_ratio, status, price, notes)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `INSERT INTO projects
+          (project_name, client_name, client_email, roof_type, membrane, square_footage, scale_ratio, status, price, notes, client_token)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, gen_random_uuid())
          RETURNING *`,
         [
           data.project_name,

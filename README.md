@@ -8,36 +8,29 @@ Built by Adam Capps as a walkthrough for Eric White.
 
 ## What This App Does
 
-RoofView Demo Co is a (fake) business that builds scaled model replicas of commercial roofs for property owners, training programs, and investor presentations. The app is a project dashboard where you can:
+RoofView Demo Co is a (fake) business that builds scaled model replicas of commercial roofs for property owners, training programs, and investor presentations. The app is a project management system where you can:
 
-- View all projects with stats (total, in progress, completed, revenue)
-- Filter by status and search by name
-- Create new projects with full details
-- Edit existing projects
-- Delete projects
+- **Login** with a single admin account (protected by session-based auth)
+- **Dashboard** — view all projects with stats (total, in progress, completed, revenue), filter by status, search by name
+- **Create / Edit / Delete** projects with full details
+- **Project Detail** — view individual projects, upload photos and documents, see status timeline
+- **Analytics** — charts showing revenue over time, project status breakdown, roof type distribution, trends
+- **Client Portal** — shareable public link for clients to check their project status (no login needed)
 - All data persists in a real PostgreSQL database
+- Files stored in Netlify Blobs
 
 ---
 
-## The Stack (3 Pieces)
+## The Stack
 
 ### 1. Git (Version Control)
-**What it does:** Tracks every change you make to the code. Think of it like "Track Changes" in Word but for code. Every save point (called a "commit") is permanent and reversible.
-
-**In this project:** The entire codebase lives in a GitHub repository. When you push code to GitHub, Netlify automatically detects the change and redeploys the site.
+Tracks every change to the code. When you push code to GitHub, Netlify automatically detects the change and redeploys the site.
 
 ### 2. Neon (Database)
-**What it does:** Neon is a cloud PostgreSQL database. It stores all the project data (client names, roof types, prices, etc.) in a real database that persists between visits.
+Cloud PostgreSQL database storing project data, session tokens, and file metadata.
 
-**In this project:** The `projects` table stores every record. The `netlify/functions/projects.js` serverless function talks to Neon using the `@neondatabase/serverless` library.
-
-### 3. Netlify (Hosting + Functions)
-**What it does:** Netlify hosts the website AND runs backend code (serverless functions). When someone visits the site, Netlify serves the HTML. When the app needs data, it calls a Netlify Function which talks to Neon.
-
-**In this project:**
-- `public/index.html` is the frontend (what you see)
-- `netlify/functions/projects.js` is the backend (talks to the database)
-- The `/api/projects` URL routes to the function automatically
+### 3. Netlify (Hosting + Functions + Blobs)
+Hosts the website, runs backend code (serverless functions), and stores uploaded files (Netlify Blobs).
 
 ---
 
@@ -50,9 +43,9 @@ Browser sends POST to /api/projects
         ↓
 Netlify routes to netlify/functions/projects.js
         ↓
-Function connects to Neon PostgreSQL
+Function checks auth cookie → validates session in DB
         ↓
-SQL INSERT runs, row saved
+SQL INSERT runs, row saved to Neon
         ↓
 Response sent back to browser
         ↓
@@ -61,100 +54,106 @@ Table refreshes with new data
 
 ---
 
-## Setup Guide (Step by Step)
-
-### Step 1: Create a Neon Database
-
-1. Go to [neon.tech](https://neon.tech) and sign up (free tier is plenty)
-2. Create a new project (name it "roofview-demo" or whatever you want)
-3. Copy the **connection string** that looks like:
-   ```
-   postgresql://username:password@ep-something.us-east-2.aws.neon.tech/neondb?sslmode=require
-   ```
-4. In the Neon dashboard, open the **SQL Editor**
-5. Paste the contents of `db-setup.sql` and run it
-6. You should see the `projects` table with 8 seed records
-
-### Step 2: Push to GitHub
-
-1. Create a new repository on GitHub (name it `roofview-demo`)
-2. In your terminal:
-   ```bash
-   cd roofview-demo
-   git init
-   git add .
-   git commit -m "Initial commit - RoofView Demo Co"
-   git branch -M main
-   git remote add origin https://github.com/YOUR-USERNAME/roofview-demo.git
-   git push -u origin main
-   ```
-
-### Step 3: Deploy on Netlify
-
-1. Go to [netlify.com](https://www.netlify.com) and sign up / log in
-2. Click **"Add new site"** then **"Import an existing project"**
-3. Connect your GitHub account and select the `roofview-demo` repo
-4. Build settings should auto-detect from `netlify.toml`:
-   - **Publish directory:** `public`
-   - **Functions directory:** `netlify/functions`
-5. Before deploying, go to **Site settings > Environment variables**
-6. Add one variable:
-   - **Key:** `DATABASE_URL`
-   - **Value:** (paste your Neon connection string from Step 1)
-7. Deploy the site
-
-### Step 4: Test It
-
-1. Visit your Netlify URL (something like `roofview-demo.netlify.app`)
-2. You should see the dashboard with 8 pre-loaded projects
-3. Try creating a new project, editing one, filtering, searching
-4. Every change is saved to Neon and will persist
-
----
-
 ## File Structure
 
 ```
 roofview-demo/
 ├── public/
-│   └── index.html          ← The entire frontend (HTML + CSS + JS)
+│   ├── index.html              ← Login page
+│   ├── dashboard.html          ← Admin dashboard (project list, CRUD)
+│   ├── project.html            ← Project detail (files, status timeline)
+│   ├── analytics.html          ← Charts and metrics
+│   ├── portal.html             ← Client portal (public, no auth)
+│   ├── css/
+│   │   ├── shared.css          ← Design tokens, reset, shared components
+│   │   ├── dashboard.css       ← Dashboard-specific styles
+│   │   ├── project.css         ← Project detail styles
+│   │   ├── analytics.css       ← Chart layout
+│   │   ├── portal.css          ← Client portal styles
+│   │   └── login.css           ← Login page styles
+│   └── js/
+│       ├── shared.js           ← API helpers, auth, toast, nav
+│       ├── dashboard.js        ← Dashboard logic
+│       ├── project.js          ← Project detail + file uploads
+│       ├── analytics.js        ← Chart rendering (Chart.js)
+│       ├── portal.js           ← Client portal logic
+│       └── login.js            ← Login form
 ├── netlify/
 │   └── functions/
-│       └── projects.js     ← Backend API (talks to Neon)
-├── db-setup.sql            ← Database table + seed data
-├── netlify.toml            ← Netlify configuration
-├── package.json            ← Node.js dependencies
-├── .gitignore              ← Files Git should ignore
-└── README.md               ← This file
+│       ├── projects.js         ← Projects CRUD API
+│       ├── auth.js             ← Login, session check, logout
+│       ├── files.js            ← File upload/download (Netlify Blobs)
+│       ├── analytics.js        ← Aggregated business metrics
+│       ├── portal-api.js       ← Public project status for clients
+│       └── lib/
+│           └── auth-check.js   ← Shared session validation helper
+├── db-setup.sql                ← Database tables + seed data
+├── netlify.toml                ← Netlify configuration
+├── package.json                ← Node.js dependencies
+├── .gitignore                  ← Files Git should ignore
+└── README.md                   ← This file
 ```
 
 ---
 
-## Making Changes (The Git Workflow)
+## Setup Guide
 
-After the initial setup, here is how you update the site:
+### Step 1: Create a Neon Database
+
+1. Go to [neon.tech](https://neon.tech) and sign up (free tier is plenty)
+2. Create a new project
+3. Copy the **connection string**
+4. In the Neon SQL Editor, paste the contents of `db-setup.sql` and run it
+
+### Step 2: Push to GitHub
 
 ```bash
-# 1. Make your code changes (edit files)
-
-# 2. See what changed
-git status
-
-# 3. Stage your changes
+cd roofview-demo
+git init
 git add .
-
-# 4. Commit with a message
-git commit -m "Added client phone number field"
-
-# 5. Push to GitHub
-git push
-
-# Netlify auto-detects the push and redeploys (usually takes 30-60 seconds)
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/roofview-demo.git
+git push -u origin main
 ```
+
+### Step 3: Deploy on Netlify
+
+1. Go to [netlify.com](https://www.netlify.com) and sign up / log in
+2. Click **"Add new site"** → **"Import an existing project"**
+3. Connect GitHub and select the repo
+4. Build settings auto-detect from `netlify.toml`
+5. Add environment variables:
+   - `DATABASE_URL` — your Neon connection string
+   - `ADMIN_USERNAME` — login username (e.g., `eric`)
+   - `ADMIN_PASSWORD_HASH` — SHA-256 hash of the password
+
+To generate the password hash, run in your terminal:
+```bash
+echo -n "your-password-here" | shasum -a 256
+```
+
+### Step 4: Test It
+
+1. Visit your Netlify URL
+2. Log in with your admin credentials
+3. You should see the dashboard with pre-loaded projects
+4. Try the analytics page, project detail pages, file uploads
+5. Copy a client portal link and open it in an incognito window
 
 ---
 
-## Key Concepts for Eric
+## Environment Variables
+
+| Variable | Description |
+|----------|------------|
+| `DATABASE_URL` | Neon PostgreSQL connection string |
+| `ADMIN_USERNAME` | Admin login username |
+| `ADMIN_PASSWORD_HASH` | SHA-256 hash of admin password |
+
+---
+
+## Key Concepts
 
 | Concept | What It Means |
 |---------|--------------|
@@ -162,29 +161,7 @@ git push
 | **Commit** | A saved snapshot of your code at a point in time. |
 | **Push** | Sending your commits from your computer to GitHub. |
 | **Serverless Function** | Backend code that runs on demand (no server to manage). |
-| **Environment Variable** | A secret value (like database passwords) stored on Netlify, not in code. |
-| **Connection String** | The URL that tells your code where the database lives and how to log in. |
-| **Deploy** | Taking your code and making it live on the internet. |
-| **SQL** | The language used to talk to databases (SELECT, INSERT, UPDATE, DELETE). |
-
----
-
-## Common Commands Reference
-
-```bash
-# Git
-git status              # See what files changed
-git add .               # Stage all changes
-git commit -m "msg"     # Save a snapshot
-git push                # Send to GitHub (triggers deploy)
-git log --oneline       # See commit history
-
-# Netlify CLI (optional)
-netlify dev             # Run the site locally
-netlify deploy          # Manual deploy
-netlify env:set KEY val # Set environment variable
-
-# Neon
-# Use the web SQL Editor at console.neon.tech
-# Or connect via psql with your connection string
-```
+| **Environment Variable** | A secret value stored on Netlify, not in code. |
+| **Session Cookie** | A small token stored in your browser that proves you're logged in. |
+| **Netlify Blobs** | File storage built into Netlify for uploads. |
+| **Client Token** | A unique UUID that gives a client access to view their project. |

@@ -1,0 +1,220 @@
+/* ===========================
+   Client portal styles
+   =========================== */
+
+.portal-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.portal-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.portal-header .logo-mark {
+  font-size: 2rem;
+  color: var(--coal);
+  margin-bottom: 0.25rem;
+}
+
+.portal-header .logo-tag {
+  display: block;
+  margin-left: 0;
+  color: var(--steel);
+}
+
+.portal-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+  margin-top: 1.5rem;
+  color: var(--coal);
+}
+
+.portal-subtitle {
+  font-size: 0.85rem;
+  color: var(--steel);
+  margin-top: 0.25rem;
+}
+
+/* Status stepper */
+.portal-stepper {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+}
+
+.stepper-step {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+
+.stepper-step::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  right: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--cloud);
+  z-index: 0;
+}
+
+.stepper-step:last-child::after { display: none; }
+
+.stepper-step.done::after { background: var(--sage); }
+
+.stepper-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--cloud);
+  margin: 0 auto 0.5rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: white;
+  font-weight: 700;
+}
+
+.stepper-step.done .stepper-dot { background: var(--sage); }
+.stepper-step.active .stepper-dot { background: var(--copper); box-shadow: 0 0 0 5px var(--copper-glow); }
+
+.stepper-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fog);
+}
+
+.stepper-step.done .stepper-label { color: var(--sage); font-weight: 500; }
+.stepper-step.active .stepper-label { color: var(--coal); font-weight: 500; }
+
+/* Project details */
+.portal-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--cloud);
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.portal-detail-item {
+  background: white;
+  padding: 1rem 1.25rem;
+}
+
+.portal-detail-item .info-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--steel);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.portal-detail-item .info-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Files in portal */
+.portal-files {
+  margin-bottom: 2rem;
+}
+
+.portal-files h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+
+.portal-file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.portal-file-card {
+  background: white;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.portal-file-card:hover { box-shadow: var(--shadow-md); }
+
+.portal-file-card img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  display: block;
+}
+
+.portal-file-card .file-placeholder {
+  width: 100%;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cloud);
+  color: var(--steel);
+  font-size: 1.5rem;
+}
+
+.portal-file-card .file-label {
+  padding: 0.5rem 0.65rem;
+  font-size: 0.75rem;
+  color: var(--steel);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Error state */
+.portal-error {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.portal-error h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--coal);
+}
+
+.portal-error p {
+  color: var(--steel);
+  font-size: 0.9rem;
+}
+
+/* Last updated */
+.portal-updated {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--fog);
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .portal-page { padding: 1rem; }
+  .portal-details { grid-template-columns: 1fr; }
+  .portal-stepper { flex-wrap: wrap; gap: 0.5rem; }
+  .stepper-step::after { display: none; }
+}

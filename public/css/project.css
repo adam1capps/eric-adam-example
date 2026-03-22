@@ -1,0 +1,310 @@
+/* ===========================
+   Project detail page styles
+   =========================== */
+
+.project-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.project-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--steel);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+.project-back:hover { color: var(--copper); }
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.project-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.project-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Info grid */
+.project-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--cloud);
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.info-item {
+  background: white;
+  padding: 1rem 1.25rem;
+}
+
+.info-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--steel);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.info-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Status timeline */
+.status-timeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+}
+
+.timeline-step {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+
+.timeline-step::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--cloud);
+  z-index: 0;
+}
+
+.timeline-step:last-child::after { display: none; }
+
+.timeline-step.active::after,
+.timeline-step.done::after {
+  background: var(--sage);
+}
+
+.timeline-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--cloud);
+  margin: 0 auto 0.5rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: white;
+}
+
+.timeline-step.done .timeline-dot { background: var(--sage); }
+.timeline-step.active .timeline-dot { background: var(--copper); box-shadow: 0 0 0 4px var(--copper-glow); }
+
+.timeline-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fog);
+}
+
+.timeline-step.done .timeline-label,
+.timeline-step.active .timeline-label { color: var(--coal); font-weight: 500; }
+
+/* Notes section */
+.project-notes {
+  margin-bottom: 2rem;
+}
+
+.project-notes h3,
+.files-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 0.75rem;
+}
+
+.notes-content {
+  background: white;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--slate);
+  white-space: pre-wrap;
+}
+
+/* Files section */
+.files-section {
+  margin-bottom: 2rem;
+}
+
+.upload-zone {
+  border: 2px dashed var(--cloud);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1.5rem;
+  background: white;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--copper);
+  background: var(--copper-glow);
+}
+
+.upload-zone p {
+  color: var(--steel);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-zone small {
+  color: var(--fog);
+  font-size: 0.75rem;
+}
+
+.upload-zone input[type="file"] { display: none; }
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.file-card {
+  background: white;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.file-card:hover { box-shadow: var(--shadow-md); }
+
+.file-thumb {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+  background: var(--cloud);
+}
+
+.file-thumb-placeholder {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cloud);
+  color: var(--steel);
+  font-size: 1.5rem;
+}
+
+.file-info {
+  padding: 0.6rem 0.75rem;
+}
+
+.file-name {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--coal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-meta {
+  font-size: 0.68rem;
+  color: var(--fog);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.file-delete {
+  background: none;
+  border: none;
+  color: var(--fog);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+}
+.file-delete:hover { color: var(--copper-dark); background: var(--copper-glow); }
+
+/* Portal link */
+.portal-link-section {
+  background: white;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.portal-link-section label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--steel);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.portal-link-url {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--steel);
+  background: var(--white);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--cloud);
+  min-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .project-page { padding: 1rem; }
+  .project-header { flex-direction: column; }
+  .status-timeline { flex-wrap: wrap; gap: 0.5rem; }
+  .timeline-step::after { display: none; }
+  .file-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}

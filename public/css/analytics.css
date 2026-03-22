@@ -1,0 +1,83 @@
+/* ===========================
+   Analytics page styles
+   =========================== */
+
+.analytics-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.analytics-page h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+/* Summary cards */
+.analytics-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  background: white;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.summary-card .stat-number {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.summary-card .stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--steel);
+}
+
+.summary-card:nth-child(1) .stat-number { color: var(--sky); }
+.summary-card:nth-child(2) .stat-number { color: var(--copper); }
+.summary-card:nth-child(3) .stat-number { color: var(--amber); }
+.summary-card:nth-child(4) .stat-number { color: var(--sage); }
+
+/* Chart grid */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.chart-card {
+  background: white;
+  border: 1px solid var(--cloud);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.chart-card h4 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  color: var(--coal);
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  max-height: 280px;
+}
+
+@media (max-width: 768px) {
+  .analytics-page { padding: 1rem; }
+  .chart-grid { grid-template-columns: 1fr; }
+}
