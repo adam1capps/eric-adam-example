@@ -187,7 +187,8 @@ function setupUpload() {
 }
 
 async function uploadFile(file) {
-  if (file.size > 4 * 1024 * 1024) {
+  // Non-image files still have a 4MB hard limit
+  if (!file.type.startsWith('image/') && file.size > 4 * 1024 * 1024) {
     showToast('File too large. Maximum size is 4MB.', true);
     return;
   }
@@ -195,22 +196,40 @@ async function uploadFile(file) {
   showToast('Uploading...');
 
   try {
+    const isImage = file.type.startsWith('image/');
     const base64 = await fileToBase64(file);
+
+    // Images get converted to JPEG during resize
+    const mimeType = isImage ? 'image/jpeg' : (file.type || 'application/octet-stream');
+    const filename = isImage ? file.name.replace(/\.[^.]+$/, '.jpg') : file.name;
+
+    const payload = JSON.stringify({
+      project_id: getProjectId(),
+      filename,
+      mime_type: mimeType,
+      file_data: base64
+    });
+
+    // Check payload size — Netlify Functions have a ~1MB body limit (6MB on paid)
+    if (payload.length > 5.5 * 1024 * 1024) {
+      showToast('File still too large after compression. Try a smaller photo.', true);
+      return;
+    }
 
     const res = await fetch(`${API_BASE}/files`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        project_id: getProjectId(),
-        filename: file.name,
-        mime_type: file.type || 'application/octet-stream',
-        file_data: base64
-      })
+      body: payload
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Upload failed');
+      let errMsg = 'Upload failed';
+      try {
+        const err = await res.json();
+        errMsg = err.error || err.details || errMsg;
+      } catch { /* response wasn't JSON */ }
+      if (res.status === 413) errMsg = 'File too large for server. Try a smaller photo.';
+      throw new Error(errMsg);
     }
 
     showToast('File uploaded');
@@ -222,14 +241,39 @@ async function uploadFile(file) {
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      // Remove the data:...;base64, prefix
-      const base64 = reader.result.split(',')[1];
-      resolve(base64);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    // If it's an image, resize it to keep payload under Netlify's 1MB body limit
+    if (file.type.startsWith('image/')) {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const MAX_DIM = 1600;
+        let { width, height } = img;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        // Use JPEG at 80% quality to keep size reasonable
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(dataUrl.split(',')[1]);
+      };
+      img.onerror = reject;
+      img.src = url;
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    }
   });
 }
 
