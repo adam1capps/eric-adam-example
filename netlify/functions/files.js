@@ -1,5 +1,4 @@
 const { neon } = require("@neondatabase/serverless");
-const { getStore } = require("@netlify/blobs");
 const { checkSession, unauthorizedResponse } = require("./lib/auth-check");
 
 exports.handler = async (event) => {
@@ -33,10 +32,8 @@ exports.handler = async (event) => {
         }
 
         const file = rows[0];
-        const store = getStore("project-files");
-        const blob = await store.get(file.blob_key, { type: "arrayBuffer" });
 
-        if (!blob) {
+        if (!file.file_data) {
           return { statusCode: 404, headers, body: JSON.stringify({ error: "File data not found" }) };
         }
 
@@ -47,7 +44,7 @@ exports.handler = async (event) => {
             "Content-Disposition": `inline; filename="${file.filename}"`,
             "Cache-Control": "public, max-age=86400",
           },
-          body: Buffer.from(blob).toString("base64"),
+          body: file.file_data,
           isBase64Encoded: true,
         };
       }
@@ -80,30 +77,24 @@ exports.handler = async (event) => {
         };
       }
 
-      // Decode base64 to buffer
-      const buffer = Buffer.from(file_data, "base64");
-      const fileSize = buffer.length;
+      // Calculate file size from base64
+      const fileSize = Math.round((file_data.length * 3) / 4);
 
-      // 4MB limit
-      if (fileSize > 4 * 1024 * 1024) {
+      // 2MB limit (after client-side compression, images should be well under this)
+      if (fileSize > 2 * 1024 * 1024) {
         return {
           statusCode: 400,
           headers,
-          body: JSON.stringify({ error: "File too large. Maximum size is 4MB." }),
+          body: JSON.stringify({ error: "File too large. Maximum size is 2MB." }),
         };
       }
 
-      // Store in Netlify Blobs
-      const blobKey = `project_${project_id}/${Date.now()}_${filename}`;
-      const store = getStore("project-files");
-      await store.set(blobKey, buffer);
-
-      // Save metadata to DB
+      // Store file data and metadata directly in the database
       const rows = await sql(
-        `INSERT INTO project_files (project_id, filename, mime_type, file_size, blob_key)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO project_files (project_id, filename, mime_type, file_size, blob_key, file_data)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id, filename, mime_type, file_size, uploaded_at`,
-        [project_id, filename, mime_type, fileSize, blobKey]
+        [project_id, filename, mime_type, fileSize, "db", file_data]
       );
 
       return {
@@ -122,20 +113,11 @@ exports.handler = async (event) => {
         return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing file_id" }) };
       }
 
-      const rows = await sql(`SELECT * FROM project_files WHERE id = $1`, [params.file_id]);
+      const rows = await sql(`SELECT id FROM project_files WHERE id = $1`, [params.file_id]);
       if (rows.length === 0) {
         return { statusCode: 404, headers, body: JSON.stringify({ error: "File not found" }) };
       }
 
-      // Delete from blob store
-      const store = getStore("project-files");
-      try {
-        await store.delete(rows[0].blob_key);
-      } catch {
-        // blob may already be gone
-      }
-
-      // Delete metadata
       await sql(`DELETE FROM project_files WHERE id = $1`, [params.file_id]);
 
       return { statusCode: 200, headers, body: JSON.stringify({ message: "File deleted" }) };

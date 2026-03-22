@@ -37,14 +37,15 @@ CREATE INDEX IF NOT EXISTS idx_projects_client ON projects(client_name);
 -- Client portal token on projects
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS client_token UUID DEFAULT gen_random_uuid();
 
--- File metadata (actual files stored in Netlify Blobs)
+-- File storage (data stored as base64 text in the database)
 CREATE TABLE IF NOT EXISTS project_files (
     id SERIAL PRIMARY KEY,
     project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     filename VARCHAR(255) NOT NULL,
     mime_type VARCHAR(100) NOT NULL,
     file_size INTEGER NOT NULL,
-    blob_key VARCHAR(500) NOT NULL,
+    blob_key VARCHAR(500) NOT NULL DEFAULT 'db',
+    file_data TEXT,
     uploaded_at TIMESTAMP DEFAULT NOW()
 );
 
