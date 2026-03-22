@@ -1,0 +1,12 @@
+{
+  "name": "roofview-demo",
+  "version": "1.0.0",
+  "description": "RoofView Demo Co - Scale model commercial roofs for training and visualization",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Static site - no build step required'"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.0"
+  }
+}
